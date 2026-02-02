@@ -1,0 +1,219 @@
+<div class="torino-header">
+  <h1>TORINO</h1>
+  <p>Catálogo Oficial • Vendas no Atacado</p>
+</div>
+
+<div class="tabs">
+  <button onclick="mostrarCatalogo(0)">Fem. Primavera Verão</button>
+  <button onclick="mostrarCatalogo(1)">Fem. Outono Inverno</button>
+  <button onclick="mostrarCatalogo(2)">Masc. Primavera Verão</button>
+  <button onclick="mostrarCatalogo(3)">Masc. Outono Inverno</button>
+</div>
+
+<div id="catalogo"></div>
+
+<style>
+  body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f5f5f5;
+  }
+
+  .torino-header {
+    text-align: center;
+    padding: 15px;
+    background: #000;
+    color: #fff;
+  }
+
+  .torino-header h1 {
+    margin: 0;
+    letter-spacing: 3px;
+  }
+
+  .tabs {
+    display: flex;
+    gap: 6px;
+    padding: 10px;
+    overflow-x: auto;
+    background: #fff;
+  }
+
+  .tabs button {
+    border: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+    background: #000;
+    color: #fff;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  #catalogo {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px;
+    padding: 12px;
+  }
+
+  .produto {
+    background: #fff;
+    border-radius: 10px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    text-align: center;
+  }
+
+  .produto img {
+    width: 100%;
+    border-radius: 8px;
+  }
+
+  .produto h3 {
+    font-size: 14px;
+    margin: 8px 0;
+  }
+
+  .produto select,
+  .produto input {
+    width: 100%;
+    padding: 6px;
+    margin-top: 6px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+  }
+
+  .info {
+    font-size: 12px;
+    color: #555;
+    margin-top: 4px;
+  }
+
+  .produto button {
+    margin-top: 10px;
+    width: 100%;
+    padding: 8px;
+    background: #25d366;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+  }
+</style>
+
+<script>
+const whatsappNumero = "5599999999999"; // <-- SEU WHATSAPP
+
+function gerarProdutos(prefixo) {
+  let produtos = [];
+  for (let i = 1; i <= 30; i++) {
+    produtos.push({
+      nome: `Modelo ${prefixo}-${i}`,
+      imagem: "https://via.placeholder.com/300",
+      cores: ["Preto", "Branco", "Azul", "Bege"],
+      precoGrade: 49.90,
+      precoCaixa: 39.90
+    });
+  }
+  return produtos;
+}
+
+const catalogos = [
+  { nome: "Feminino Primavera Verão", produtos: gerarProdutos("FPV") },
+  { nome: "Feminino Outono Inverno", produtos: gerarProdutos("FOI") },
+  { nome: "Masculino Primavera Verão", produtos: gerarProdutos("MPV") },
+  { nome: "Masculino Outono Inverno", produtos: gerarProdutos("MOI") }
+];
+
+const container = document.getElementById("catalogo");
+
+function mostrarCatalogo(index) {
+  container.innerHTML = "";
+  const catalogo = catalogos[index];
+
+  catalogo.produtos.forEach(produto => {
+    const div = document.createElement("div");
+    div.className = "produto";
+
+    div.innerHTML = `
+      <img src="${produto.imagem}">
+      <h3>${produto.nome}</h3>
+
+      <select class="tipo">
+        <option value="grade">Grade • 24 peças (P–M–G–GG)</option>
+        <option value="caixa">Caixa • 200 peças</option>
+      </select>
+
+      <select class="cor">
+        ${produto.cores.map(c => `<option>${c}</option>`).join("")}
+      </select>
+
+      <input type="number" class="quantidade" value="24" min="24" step="24">
+
+      <div class="info">Grade: múltiplos de 24 • Caixa: fechada</div>
+
+      <button>Comprar no Atacado</button>
+    `;
+
+    const tipo = div.querySelector(".tipo");
+    const quantidade = div.querySelector(".quantidade");
+    const cor = div.querySelector(".cor");
+    const botao = div.querySelector("button");
+
+    tipo.onchange = () => {
+      if (tipo.value === "grade") {
+        quantidade.value = 24;
+        quantidade.min = 24;
+        quantidade.step = 24;
+      } else {
+        quantidade.value = 200;
+        quantidade.min = 200;
+        quantidade.step = 200;
+      }
+    };
+
+    botao.onclick = () => {
+      const qnt = parseInt(quantidade.value);
+      const tipoVenda = tipo.value;
+
+      if (tipoVenda === "grade" && qnt % 24 !== 0) {
+        alert("A grade deve ser múltiplo de 24 peças.");
+        return;
+      }
+
+      if (tipoVenda === "caixa" && qnt !== 200) {
+        alert("A caixa é fechada com 200 peças.");
+        return;
+      }
+
+      const precoUnit = tipoVenda === "grade" ? produto.precoGrade : produto.precoCaixa;
+      const total = (qnt * precoUnit).toFixed(2);
+
+      const mensagem = `
+PEDIDO ATACADO • TORINO
+
+Catálogo: ${catalogo.nome}
+Produto: ${produto.nome}
+Cor: ${cor.value}
+
+Tipo: ${tipoVenda.toUpperCase()}
+Quantidade: ${qnt}
+
+Grade P–M–G–GG ou Caixa Fechada
+Valor unitário: R$ ${precoUnit.toFixed(2)}
+Total: R$ ${total}
+      `;
+
+      window.open(
+        "https://wa.me/" + whatsappNumero + "?text=" + encodeURIComponent(mensagem),
+        "_blank"
+      );
+    };
+
+    container.appendChild(div);
+  });
+}
+
+mostrarCatalogo(0);
+</script>
